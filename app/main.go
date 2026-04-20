@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"net"
 	"os"
 )
@@ -19,14 +18,14 @@ var _ = os.Exit
 // }
 
 func handle(conn net.Conn) {
-	fmt.Println("Entering handle")
+	//fmt.Println("Entering handle")
 	defer conn.Close()
 
 	scanner := bufio.NewScanner(conn)
 
 	for scanner.Scan() {
-		msg := scanner.Text()
-		log.Println("received msg :", msg)
+		//msg := scanner.Text()
+		//log.Println("received msg :", msg)
 
 		conn.Write([]byte("+PONG\r\n"))
 	}
