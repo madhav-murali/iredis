@@ -19,6 +19,7 @@ var _ = os.Exit
 // }
 
 func handle(conn net.Conn) {
+	fmt.Println("Entering handle")
 	defer conn.Close()
 
 	scanner := bufio.NewScanner(conn)
@@ -30,7 +31,7 @@ func handle(conn net.Conn) {
 		conn.Write([]byte("+PONG\r\n"))
 	}
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Error in scanner")
+		fmt.Println("Error in scanner", err)
 	}
 }
 
