@@ -21,16 +21,20 @@ func handle(conn net.Conn) {
 	//fmt.Println("Entering handle")
 	defer conn.Close()
 
-	scanner := bufio.NewScanner(conn)
+	reader := bufio.NewReader(conn)
 
-	for scanner.Scan() {
+	for {
 		//msg := scanner.Text()
 		//log.Println("received msg :", msg)
-
-		conn.Write([]byte("+PONG\r\n"))
-	}
-	if err := scanner.Err(); err != nil {
-		fmt.Println("Error in scanner", err)
+		_, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("error reading from client")
+		}
+		_, err = conn.Write([]byte("+PONG\r\n"))
+		if err != nil {
+			fmt.Println("wrting error in conn")
+			return
+		}
 	}
 }
 
