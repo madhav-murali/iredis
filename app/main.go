@@ -30,6 +30,7 @@ func handle(conn net.Conn) {
 		_, err := reader.ReadString('\n')
 		if err != nil {
 			fmt.Println("error reading from client")
+			return
 		}
 
 		writer.WriteString("+PONG\r\n")
