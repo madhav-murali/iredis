@@ -22,6 +22,7 @@ func handle(conn net.Conn) {
 	defer conn.Close()
 
 	reader := bufio.NewReader(conn)
+	writer := bufio.NewWriter(conn)
 
 	for {
 		//msg := scanner.Text()
@@ -30,11 +31,9 @@ func handle(conn net.Conn) {
 		if err != nil {
 			fmt.Println("error reading from client")
 		}
-		_, err = conn.Write([]byte("+PONG\r\n"))
-		if err != nil {
-			fmt.Println("wrting error in conn")
-			return
-		}
+
+		writer.WriteString("+PONG\r\n")
+		writer.Flush()
 	}
 }
 
