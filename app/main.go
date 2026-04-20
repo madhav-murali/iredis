@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"net"
 	"os"
 )
@@ -11,10 +12,26 @@ import (
 var _ = net.Listen
 var _ = os.Exit
 
-func handlepongs(conn net.Conn) {
-	writer := bufio.NewWriter(conn)
-	writer.WriteString("+PONG\r\n")
-	writer.Flush()
+// func handlepongs(conn net.Conn) {
+// 	writer := bufio.NewWriter(conn)
+// 	writer.WriteString("+PONG\r\n")
+// 	writer.Flush()
+// }
+
+func handle(conn net.Conn) {
+	defer conn.Close()
+
+	scanner := bufio.NewScanner(conn)
+
+	for scanner.Scan() {
+		msg := scanner.Text()
+		log.Println("received msg :", msg)
+
+		conn.Write([]byte("+PONG\r\n"))
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error in scanner")
+	}
 }
 
 func main() {
@@ -32,8 +49,6 @@ func main() {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-	for {
-		handlepongs(conn)
-	}
+	go handle(conn)
 
 }
