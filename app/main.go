@@ -47,21 +47,21 @@ func handle(conn net.Conn) {
 		re := regexp.MustCompile(`\d+`)
 		matches := re.FindAllString(numCmds, -1)
 		numCmds_, err := strconv.Atoi(matches[0])
-		cmds := make([]string, numCmds_)
+		cmds := make([]string, 0, numCmds_)
 		for range numCmds_ {
-			_, err := reader.ReadString('\n') //now we need to read the $ number
+			_, err := reader.ReadString('\n') //this shit alsoo reads the \r\n -> need to trim it
 			if err != nil {
 				fmt.Println("error reading from client")
 				return
 			}
 			c, err := reader.ReadString('\n')
-			cmds = append(cmds, c)
+			cmds = append(cmds, c[:len(c)-2])
 			// handlepongs(conn)
 		}
 		if strings.ToLower(cmds[0]) == "echo" {
 			allCmds := strings.Join(cmds[1:], " ")
 			sizeofString := len(allCmds)
-			echoString := "$" + string(sizeofString) + "\r\n" + allCmds + "\r\n"
+			echoString := "$" + strconv.Itoa(sizeofString) + "\r\n" + allCmds + "\r\n"
 			handleWrite(conn, echoString)
 		} else {
 			send := "+PONG\r\n"
