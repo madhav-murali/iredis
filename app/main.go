@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/codecrafters-io/redis-starter-go/internal/resp"
@@ -96,7 +97,8 @@ func handle(conn net.Conn) error {
 			if err != nil {
 				return err
 			}
-			returnString := "+" + val.(string) + "\r\n"
+			valString := val.(string)
+			returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + "+" + valString + "\r\n"
 			handleWrite(*Writer, returnString)
 		}
 	}
