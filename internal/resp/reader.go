@@ -48,7 +48,7 @@ func parseBulkLength(r *bufio.Reader) (int, error) {
 	}
 
 	line = strings.TrimSpace(line)
-	return strconv.Atoi(line)
+	return strconv.Atoi(line[1:])
 }
 
 func readFullBody(r *bufio.Reader, length int) ([]byte, error) {
