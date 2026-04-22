@@ -2,13 +2,28 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"net"
 	"os"
-	"regexp"
-	"strconv"
-	"strings"
+
+	"github.com/codecrafters-io/redis-starter-go/internal/resp"
 )
+
+var Store map[any]any
+
+func Put(key, val any) error {
+	Store[key] = val
+	return nil
+}
+
+func Get(key any) (any, error) {
+	val, ok := Store[key]
+	if !ok {
+		return nil, errors.New("couldn't get the key")
+	}
+	return val, nil
+}
 
 // Ensures gofmt doesn't remove the "net" and "os" imports in stage 1 (feel free to remove this!)
 var _ = net.Listen
@@ -20,8 +35,7 @@ var _ = os.Exit
 // 	writer.Flush()
 // }
 
-func handleWrite(conn net.Conn, s string) {
-	writer := bufio.NewWriter(conn)
+func handleWrite(writer bufio.Writer, s string) {
 	writer.WriteString(s)
 	writer.Flush()
 }
@@ -32,40 +46,40 @@ func handleWrite(conn net.Conn, s string) {
 // we get it like *number\r\n$number\r\nPING\r\n -> we need to get these values before the other one
 // *number -> number of words in the command like ping has 1, "echo hey" has two
 // this needs to be appended
-func handle(conn net.Conn) {
+func handle(conn net.Conn) error {
 	//fmt.Println("Entering handle")
 	defer conn.Close()
-
-	reader := bufio.NewReader(conn)
-	//writer := bufio.NewWriter(conn)
-
+	Reader := bufio.NewReader(conn)
+	Writer := bufio.NewWriter(conn)
 	for {
-		numCmds, err := reader.ReadString('\n') // we get *number or the number of words in cmd.
+		//this doesnt have nested array capabilities yet
+		elements, err := resp.ParseRESP(Reader)
 		if err != nil {
-			fmt.Println("error reading number of commands:", err)
+			fmt.Printf("encountered err : %v", err)
+			return err
 		}
-		re := regexp.MustCompile(`\d+`)
-		matches := re.FindAllString(numCmds, -1)
-		numCmds_, err := strconv.Atoi(matches[0])
-		cmds := make([]string, 0, numCmds_)
-		for range numCmds_ {
-			_, err := reader.ReadString('\n') //this shit alsoo reads the \r\n -> need to trim it
-			if err != nil {
-				fmt.Println("error reading from client")
-				return
+		switch elements[0] {
+		case "PING":
+			handleWrite(*Writer, "+PONG\r\n")
+		case "SET":
+			if len(elements) != 3 {
+				fmt.Printf("invalid usage of 'get'")
+				return fmt.Errorf("invalid number of args with SET")
 			}
-			c, err := reader.ReadString('\n')
-			cmds = append(cmds, c[:len(c)-2])
-			// handlepongs(conn)
-		}
-		if strings.ToLower(cmds[0]) == "echo" {
-			allCmds := strings.Join(cmds[1:], " ")
-			sizeofString := len(allCmds)
-			echoString := "$" + strconv.Itoa(sizeofString) + "\r\n" + allCmds + "\r\n"
-			handleWrite(conn, echoString)
-		} else {
-			send := "+PONG\r\n"
-			handleWrite(conn, send)
+			if err := Put(elements[1], elements[2]); err != nil {
+				return err
+			}
+			handleWrite(*Writer, "+OK\r\n")
+		case "GET":
+			if len(elements) != 2 {
+				return fmt.Errorf("invalid number of args with 'set'")
+			}
+			val, err := Get(elements[1])
+			if err != nil {
+				return err
+			}
+			returnString := "+" + val.(string) + "\r\n"
+			handleWrite(*Writer, returnString)
 		}
 	}
 }
