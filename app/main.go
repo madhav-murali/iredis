@@ -98,7 +98,7 @@ func handle(conn net.Conn) error {
 				return err
 			}
 			valString := val.(string)
-			returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + "+" + valString + "\r\n"
+			returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + valString + "\r\n"
 			handleWrite(*Writer, returnString)
 		}
 	}
