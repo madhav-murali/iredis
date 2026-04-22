@@ -11,7 +11,7 @@ import (
 	"github.com/codecrafters-io/redis-starter-go/internal/resp"
 )
 
-var Store map[any]any
+var Store = make(map[any]any)
 
 func Put(key, val any) error {
 	Store[key] = val
