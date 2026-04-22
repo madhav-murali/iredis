@@ -59,6 +59,7 @@ func handle(conn net.Conn) error {
 			fmt.Printf("encountered err : %v", err)
 			return err
 		}
+		fmt.Println("entering switch for :", elements[0])
 		switch elements[0] {
 		case "PING":
 			handleWrite(*Writer, "+PONG\r\n")
