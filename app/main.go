@@ -44,11 +44,13 @@ func handleWrite(writer bufio.Writer, s string) {
 
 func toStringSlice(elements []any) []string {
 	res := make([]string, len(elements))
-	for i := range len(elements) {
-		res[i] = fmt.Sprintf("%v", elements[i])
-	}
-	for i := range len(res) {
-		fmt.Print(res[i])
+	for i, val := range elements {
+		switch v := val.(type) {
+		case []byte:
+			res[i] = string(v)
+		default:
+			res[i] = fmt.Sprintf("%v", elements[i])
+		}
 	}
 	return res
 }
