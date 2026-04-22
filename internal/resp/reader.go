@@ -14,7 +14,8 @@ func ParseRESP(r *bufio.Reader) ([]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	count, err := strconv.Atoi(strings.TrimSpace(line))
+	line = strings.TrimSpace(line)
+	count, err := strconv.Atoi(line[1:])
 	if err != nil {
 		return nil, err
 	}
