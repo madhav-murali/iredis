@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/codecrafters-io/redis-starter-go/internal/resp"
@@ -98,14 +97,14 @@ func handle(conn net.Conn) error {
 				return err
 			}
 			valString := val.(string)
-			returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + valString + "\r\n"
-			handleWrite(*Writer, returnString)
+			//returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + valString + "\r\n"
+			handleWrite(*Writer, resp.EchoRESP(valString))
 		case "ECHO":
 			// if len(elements) != 2 {
 			// 	return fmt.Errorf("invalid number of strings, echo needs only one arg")
 			// }
 			writeString := strings.Join(elements[1:], "")
-			handleWrite(*Writer, writeString)
+			handleWrite(*Writer, resp.EchoRESP(writeString))
 		}
 	}
 }
