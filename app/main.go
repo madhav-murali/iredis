@@ -36,6 +36,7 @@ var _ = os.Exit
 // }
 
 func handleWrite(writer bufio.Writer, s string) {
+	fmt.Println("entering writer handler for string: ", s)
 	writer.WriteString(s)
 	writer.Flush()
 }
@@ -94,7 +95,6 @@ func main() {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
 	}
-	fmt.Println("Why is this happening")
 	for {
 		conn, err := l.Accept()
 		if err != nil {
