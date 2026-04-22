@@ -100,6 +100,12 @@ func handle(conn net.Conn) error {
 			valString := val.(string)
 			returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + valString + "\r\n"
 			handleWrite(*Writer, returnString)
+		case "ECHO":
+			// if len(elements) != 2 {
+			// 	return fmt.Errorf("invalid number of strings, echo needs only one arg")
+			// }
+			writeString := strings.Join(elements[1:], "")
+			handleWrite(*Writer, writeString)
 		}
 	}
 }
