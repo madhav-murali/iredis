@@ -47,6 +47,9 @@ func toStringSlice(elements []any) []string {
 	for i := range len(elements) {
 		res[i] = fmt.Sprintf("%v", elements[i])
 	}
+	for i := range len(res) {
+		fmt.Print(res[i])
+	}
 	return res
 }
 
