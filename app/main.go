@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"strings"
@@ -70,6 +71,10 @@ func handle(conn net.Conn) error {
 		//this doesnt have nested array capabilities yet
 		elementsAny, err := resp.ParseRESP(Reader)
 		if err != nil {
+			if err == io.EOF {
+				fmt.Println("client closed the connection")
+				return nil
+			}
 			fmt.Printf("encountered err : %v", err)
 			return err
 		}
