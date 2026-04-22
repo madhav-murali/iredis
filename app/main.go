@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
 
 	"github.com/codecrafters-io/redis-starter-go/internal/resp"
 )
@@ -68,8 +69,9 @@ func handle(conn net.Conn) error {
 			return err
 		}
 		elements := toStringSlice(elementsAny)
-		fmt.Println("entering switch for :", elements[0])
-		switch elements[0] {
+		cmd := strings.ToUpper(elements[0])
+		fmt.Println("entering switch for :", cmd)
+		switch cmd {
 		case "PING":
 			handleWrite(*Writer, "+PONG\r\n")
 		case "SET":
