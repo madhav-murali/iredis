@@ -41,6 +41,14 @@ func handleWrite(writer bufio.Writer, s string) {
 	writer.Flush()
 }
 
+func toStringSlice(elements []any) []string {
+	res := make([]string, len(elements))
+	for i := range len(elements) {
+		res[i] = fmt.Sprintf("%v", elements[i])
+	}
+	return res
+}
+
 //TODO: make a resp decoder?;
 //func decodeRESP()
 
@@ -54,11 +62,12 @@ func handle(conn net.Conn) error {
 	Writer := bufio.NewWriter(conn)
 	for {
 		//this doesnt have nested array capabilities yet
-		elements, err := resp.ParseRESP(Reader)
+		elementsAny, err := resp.ParseRESP(Reader)
 		if err != nil {
 			fmt.Printf("encountered err : %v", err)
 			return err
 		}
+		elements := toStringSlice(elementsAny)
 		fmt.Println("entering switch for :", elements[0])
 		switch elements[0] {
 		case "PING":
