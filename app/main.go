@@ -10,7 +10,10 @@ import (
 	"strings"
 
 	"github.com/codecrafters-io/redis-starter-go/internal/resp"
+	"github.com/codecrafters-io/redis-starter-go/internal/storage"
 )
+
+var c storage.Cache
 
 var Store = make(map[any]any)
 
@@ -56,9 +59,6 @@ func toStringSlice(elements []any) []string {
 	return res
 }
 
-//TODO: make a resp decoder?;
-//func decodeRESP()
-
 // we get it like *number\r\n$number\r\nPING\r\n -> we need to get these values before the other one
 // *number -> number of words in the command like ping has 1, "echo hey" has two
 // this needs to be appended
@@ -85,14 +85,11 @@ func handle(conn net.Conn) error {
 		case "PING":
 			handleWrite(*Writer, "+PONG\r\n")
 		case "SET":
-			if len(elements) != 3 {
-				fmt.Printf("invalid usage of 'get'")
-				return fmt.Errorf("invalid number of args with SET")
+			if err := storage.HandleSet(&c, *Writer, elements); err != nil {
+				handleWrite(*Writer, "-1\r\n") // handling nil
+			} else {
+				handleWrite(*Writer, "+OK\r\n")
 			}
-			if err := Put(elements[1], elements[2]); err != nil {
-				return err
-			}
-			handleWrite(*Writer, "+OK\r\n")
 		case "GET":
 			if len(elements) != 2 {
 				return fmt.Errorf("invalid number of args with 'set'")
