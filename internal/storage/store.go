@@ -35,8 +35,8 @@ func (c *Cache) Set(key any, value any, ttl time.Duration) error {
 }
 
 func (c *Cache) Get(key any) (any, bool) {
-	c.rw.Lock()
-	defer c.rw.Unlock()
+	c.rw.RLock()
+	defer c.rw.RUnlock()
 
 	item, ok := c.items[key]
 	if !ok {
