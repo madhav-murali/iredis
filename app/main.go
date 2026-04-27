@@ -86,7 +86,7 @@ func handle(conn net.Conn, c *storage.Cache) error {
 			handleWrite(*Writer, "+PONG\r\n")
 		case "SET":
 			if err := storage.HandleSet(c, elements); err != nil {
-				handleWrite(*Writer, "-1\r\n") // handling nil
+				handleWrite(*Writer, "$-1\r\n") // handling nil
 			} else {
 				handleWrite(*Writer, "+OK\r\n")
 			}
@@ -103,7 +103,7 @@ func handle(conn net.Conn, c *storage.Cache) error {
 			// handleWrite(*Writer, resp.EchoRESP(valString))
 			val, ok := c.Get(elements[1])
 			if !ok {
-				handleWrite(*Writer, "-1\r\n")
+				handleWrite(*Writer, "$-1\r\n")
 				return errors.New("invalid key or has expired")
 			}
 			valString := val.(string)
