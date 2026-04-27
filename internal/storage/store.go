@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -41,6 +42,7 @@ func (c *Cache) Get(key any) (any, bool) {
 	if !ok {
 		return nil, false
 	}
+	fmt.Println("Got the val, now checking expiry")
 
 	if !item.Expiry.IsZero() || time.Now().After(item.Expiry) {
 		return nil, false
