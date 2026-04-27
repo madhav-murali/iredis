@@ -27,6 +27,10 @@ func (c *Cache) Set(key any, value any, ttl time.Duration) error {
 	c.rw.Lock()
 	defer c.rw.Unlock()
 
+	// var expiry time.Time
+	// if ttl > 0 {
+	// 	expiry = time.Now().Add(ttl)
+	// }
 	c.items[key] = Entry{
 		Value:  value,
 		Expiry: time.Now().Add(ttl),
@@ -44,8 +48,8 @@ func (c *Cache) Get(key any) (any, bool) {
 	}
 	fmt.Println("Got the val, now checking expiry")
 
-	if !item.Expiry.IsZero() || time.Now().After(item.Expiry) {
+	if !item.Expiry.IsZero() && time.Now().After(item.Expiry) {
 		return nil, false
 	}
-	return item, true
+	return item.Value, true
 }
