@@ -27,13 +27,13 @@ func (c *Cache) Set(key any, value any, ttl time.Duration) error {
 	c.rw.Lock()
 	defer c.rw.Unlock()
 
-	// var expiry time.Time
-	// if ttl > 0 {
-	// 	expiry = time.Now().Add(ttl)
-	// }
+	var expiry time.Time
+	if ttl > 0 {
+		expiry = time.Now().Add(ttl)
+	}
 	c.items[key] = Entry{
 		Value:  value,
-		Expiry: time.Now().Add(ttl),
+		Expiry: expiry,
 	}
 	return nil
 }
