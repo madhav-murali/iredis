@@ -15,6 +15,12 @@ type Cache struct {
 	items map[any]Entry
 }
 
+func NewCache() *Cache {
+	return &Cache{
+		items: make(map[any]Entry),
+	}
+}
+
 // Set sets the Key and Value with ttl(default = nil)
 func (c *Cache) Set(key any, value any, ttl time.Duration) error {
 	c.rw.Lock()
@@ -32,7 +38,11 @@ func (c *Cache) Get(key any) (any, bool) {
 	defer c.rw.Unlock()
 
 	item, ok := c.items[key]
-	if !ok || time.Now().After(item.Expiry) {
+	if !ok {
+		return nil, false
+	}
+
+	if !item.Expiry.IsZero() || time.Now().After(item.Expiry) {
 		return nil, false
 	}
 	return item, true

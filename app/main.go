@@ -13,7 +13,7 @@ import (
 	"github.com/codecrafters-io/redis-starter-go/internal/storage"
 )
 
-var c storage.Cache
+// var c storage.Cache
 
 var Store = make(map[any]any)
 
@@ -62,7 +62,7 @@ func toStringSlice(elements []any) []string {
 // we get it like *number\r\n$number\r\nPING\r\n -> we need to get these values before the other one
 // *number -> number of words in the command like ping has 1, "echo hey" has two
 // this needs to be appended
-func handle(conn net.Conn) error {
+func handle(conn net.Conn, c *storage.Cache) error {
 	//fmt.Println("Entering handle")
 	defer conn.Close()
 	Reader := bufio.NewReader(conn)
@@ -85,22 +85,31 @@ func handle(conn net.Conn) error {
 		case "PING":
 			handleWrite(*Writer, "+PONG\r\n")
 		case "SET":
-			if err := storage.HandleSet(&c, *Writer, elements); err != nil {
+			if err := storage.HandleSet(c, elements); err != nil {
 				handleWrite(*Writer, "-1\r\n") // handling nil
 			} else {
 				handleWrite(*Writer, "+OK\r\n")
 			}
 		case "GET":
-			if len(elements) != 2 {
-				return fmt.Errorf("invalid number of args with 'set'")
-			}
-			val, err := Get(elements[1])
-			if err != nil {
-				return err
+			// if len(elements) != 2 {
+			// 	return fmt.Errorf("invalid number of args with 'set'")
+			// }
+			// val, err := Get(elements[1])
+			// if err != nil {
+			// 	return err
+			// }
+			// valString := val.(string)
+			// //returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + valString + "\r\n"
+			// handleWrite(*Writer, resp.EchoRESP(valString))
+			val, err := c.Get(elements[1])
+			if err != true {
+				handleWrite(*Writer, "-1\r\n")
+				return errors.New("invalid key or has expired")
 			}
 			valString := val.(string)
 			//returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + valString + "\r\n"
 			handleWrite(*Writer, resp.EchoRESP(valString))
+
 		case "ECHO":
 			// if len(elements) != 2 {
 			// 	return fmt.Errorf("invalid number of strings, echo needs only one arg")
@@ -114,7 +123,7 @@ func handle(conn net.Conn) error {
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Logs from your program will appear here!")
-
+	c := storage.NewCache()
 	// Uncomment the code below to pass the first stage
 	l, err := net.Listen("tcp", "0.0.0.0:6379")
 	if err != nil {
@@ -127,7 +136,7 @@ func main() {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
 		}
-		go handle(conn)
+		go handle(conn, c)
 	}
 
 }

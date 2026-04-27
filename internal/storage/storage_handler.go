@@ -1,14 +1,13 @@
 package storage
 
 import (
-	"bufio"
 	"errors"
 	"log"
 	"strconv"
 	"time"
 )
 
-func HandleSet(c *Cache, writer bufio.Writer, elements []string) error {
+func HandleSet(c *Cache, elements []string) error {
 	// if len(elements) != 3 {
 	// 	fmt.Printf("invalid usage of 'get'")
 	// 	return fmt.Errorf("invalid number of args with SET")
@@ -36,3 +35,19 @@ func HandleSet(c *Cache, writer bufio.Writer, elements []string) error {
 	// handleWrite(*Writer, "+OK\r\n")
 	return nil
 }
+
+// func HandleGet(c *Cache, elements []string) (any, error) {
+
+// 	// if len(elements) != 2 {
+// 	// 	return fmt.Errorf("invalid number of args with 'set'")
+// 	// }
+// 	// val, err := Get(elements[1])
+// 	// if err != nil {
+// 	// 	return err
+// 	// }
+// 	// valString := val.(string)
+// 	// //returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + valString + "\r\n"
+// 	// handleWrite(*Writer, resp.EchoRESP(valString))
+
+// 	return c.Get(elements[1])
+// }
