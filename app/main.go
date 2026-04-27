@@ -106,6 +106,7 @@ func handle(conn net.Conn, c *storage.Cache) error {
 				handleWrite(*Writer, "-1\r\n")
 				return errors.New("invalid key or has expired")
 			}
+			fmt.Println(val)
 			valString := val.(string)
 			//returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + valString + "\r\n"
 			handleWrite(*Writer, resp.EchoRESP(valString))
