@@ -24,18 +24,26 @@ func (l *List) MultiRPUSH(key string, val []string) int {
 	return len(l.Items[key])
 }
 
-func (l *List) LRANGE(key string, s, e string) []string {
+func (l *List) LRANGE(key, start, end string) []string {
 	var ret []string
-	sInt, err := strconv.Atoi(s)
+	s, err := strconv.Atoi(start)
 	if err != nil {
 		return nil
 	}
-	eInt, err := strconv.Atoi(e)
+	e, err := strconv.Atoi(end)
 	if err != nil {
 		return nil
 	}
-	end := min(eInt, len(l.Items[key])-1)
-	for i := sInt; i <= end; i++ {
+	if s < 0 {
+		s = len(l.Items[key]) + s
+	}
+	if e < 0 {
+		e = len(l.Items[key]) + e
+	}
+	sInt := min(s, e)
+	eInt := max(s, e)
+	endIter := min(eInt, len(l.Items[key])-1)
+	for i := sInt; i <= endIter; i++ {
 		ret = append(ret, l.Items[key][i])
 	}
 	return ret
