@@ -49,6 +49,7 @@ func (l *List) LRANGE(key, start, end string) []string {
 	return ret
 }
 
+// uses copy to extend the slice
 func (l *List) LPUSH(key string, val []string) int {
 	length := len(val)
 	l.Items[key] = append(l.Items[key], make([]string, length)...)
