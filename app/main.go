@@ -105,6 +105,8 @@ func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 		case "LPUSH":
 			length := lst.LPUSH(elements[1], elements[2:])
 			handleWrite(*Writer, ":"+strconv.Itoa(length)+"\r\n")
+		case "LLEN":
+			handleWrite(*Writer, ":"+strconv.Itoa(lst.LLEN(elements[1]))+"\r\n")
 		}
 	}
 }

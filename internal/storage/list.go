@@ -61,3 +61,7 @@ func (l *List) LPUSH(key string, val []string) int {
 	}
 	return len(l.Items[key])
 }
+
+func (l *List) LLEN(key string) int {
+	return len(l.Items[key])
+}
