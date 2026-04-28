@@ -40,10 +40,8 @@ func (l *List) LRANGE(key, start, end string) []string {
 	if e < 0 {
 		e = len(l.Items[key]) + e
 	}
-	sInt := min(s, e)
-	eInt := max(s, e)
-	endIter := min(eInt, len(l.Items[key])-1)
-	for i := sInt; i <= endIter; i++ {
+
+	for i := min(s, e); i <= max(s, e) && i < len(l.Items[key]); i++ {
 		ret = append(ret, l.Items[key][i])
 	}
 	return ret
