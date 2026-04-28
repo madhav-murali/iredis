@@ -15,4 +15,11 @@ func (l *List) RPUSH(key, val string) int {
 	return len(l.Items[key])
 }
 
+func (l *List) MultiRPUSH(key string, val []string) int {
+	for _, v := range val {
+		l.Items[key] = append(l.Items[key], v)
+	}
+	return len(l.Items[key])
+}
+
 //rpush using a key to a list
