@@ -41,7 +41,7 @@ func (l *List) LRANGE(key, start, end string) []string {
 		e = len(l.Items[key]) + e
 	}
 
-	for i := min(s, e); i <= max(s, e) && i < len(l.Items[key]); i++ {
+	for i := s; i <= e && i < len(l.Items[key]); i++ {
 		ret = append(ret, l.Items[key][i])
 	}
 	return ret
