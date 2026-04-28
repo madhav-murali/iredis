@@ -123,7 +123,7 @@ func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 				handleWrite(*Writer, "$-1\r\n")
 				return errors.New("invalid key or has no elems")
 			}
-			handleWrite(*Writer, resp.EchoRESP(st))
+			handleWrite(*Writer, st)
 		}
 	}
 }
