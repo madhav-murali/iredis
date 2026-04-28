@@ -66,12 +66,12 @@ func (l *List) LLEN(key string) int {
 	return len(l.Items[key])
 }
 
-func (l *List) LPOP(key string) string {
+func (l *List) LPOP(key string, length int) []string {
 	if len(l.Items[key]) == 0 {
-		return ""
+		return []string{"-1"}
 	}
 	defer func() {
-		l.Items[key] = l.Items[key][1:]
+		l.Items[key] = l.Items[key][length+1:]
 	}()
-	return l.Items[key][0]
+	return l.Items[key][0:length]
 }

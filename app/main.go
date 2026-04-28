@@ -108,8 +108,18 @@ func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 		case "LLEN":
 			handleWrite(*Writer, ":"+strconv.Itoa(lst.LLEN(elements[1]))+"\r\n")
 		case "LPOP":
-			st := lst.LPOP(elements[1])
-			if st == "" {
+			var s strings.Builder
+			toPop := 1
+			if len(elements) > 2 {
+				toPop, err = strconv.Atoi(elements[2])
+				if err != nil {
+					handleWrite(*Writer, "$-1\r\n")
+					return errors.New("invalid key or has no elems")
+				}
+			}
+			s.WriteString(resp.RESPstring(lst.LPOP(elements[1], toPop)))
+			st := s.String()
+			if st == "-1" {
 				handleWrite(*Writer, "$-1\r\n")
 				return errors.New("invalid key or has no elems")
 			}
