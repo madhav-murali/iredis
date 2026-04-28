@@ -71,7 +71,7 @@ func (l *List) LPOP(key string, length int) []string {
 		return []string{"-1"}
 	}
 	defer func() {
-		l.Items[key] = l.Items[key][length+1:]
+		l.Items[key] = l.Items[key][length:]
 	}()
 	return l.Items[key][0:length]
 }
