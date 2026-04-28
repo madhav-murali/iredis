@@ -35,12 +35,6 @@ func Get(key any) (any, error) {
 var _ = net.Listen
 var _ = os.Exit
 
-// func handlepongs(conn net.Conn) {
-// 	writer := bufio.NewWriter(conn)
-// 	writer.WriteString("+PONG\r\n")
-// 	writer.Flush()
-// }
-
 func handleWrite(writer bufio.Writer, s string) {
 	fmt.Println("entering writer handler for string: ", s)
 	writer.WriteString(s)
@@ -69,7 +63,6 @@ func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 	Reader := bufio.NewReader(conn)
 	Writer := bufio.NewWriter(conn)
 	for {
-		//this doesnt have nested array capabilities yet
 		elementsAny, err := resp.ParseRESP(Reader)
 		if err != nil {
 			if err == io.EOF {
@@ -92,16 +85,6 @@ func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 				handleWrite(*Writer, "+OK\r\n")
 			}
 		case "GET":
-			// if len(elements) != 2 {
-			// 	return fmt.Errorf("invalid number of args with 'set'")
-			// }
-			// val, err := Get(elements[1])
-			// if err != nil {
-			// 	return err
-			// }
-			// valString := val.(string)
-			// //returnString := "$" + strconv.Itoa(len(valString)) + "\r\n" + valString + "\r\n"
-			// handleWrite(*Writer, resp.EchoRESP(valString))
 			val, ok := c.Get(elements[1])
 			if !ok {
 				handleWrite(*Writer, "$-1\r\n")
@@ -112,16 +95,13 @@ func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 			handleWrite(*Writer, resp.EchoRESP(valString))
 
 		case "ECHO":
-			// if len(elements) != 2 {
-			// 	return fmt.Errorf("invalid number of strings, echo needs only one arg")
-			// }
 			writeString := strings.Join(elements[1:], "")
 			handleWrite(*Writer, resp.EchoRESP(writeString))
 		case "RPUSH":
-			// if len(elements) > 3:
-			// 	length :=
 			length := lst.MultiRPUSH(elements[1], elements[2:])
 			handleWrite(*Writer, ":"+strconv.Itoa(length)+"\r\n")
+		case "LRANGE":
+			handleWrite(*Writer, resp.RESPstring(lst.LRANGE(elements[1], elements[2], elements[3])))
 		}
 	}
 }
