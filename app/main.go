@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/codecrafters-io/redis-starter-go/internal/resp"
@@ -62,7 +63,7 @@ func toStringSlice(elements []any) []string {
 // we get it like *number\r\n$number\r\nPING\r\n -> we need to get these values before the other one
 // *number -> number of words in the command like ping has 1, "echo hey" has two
 // this needs to be appended
-func handle(conn net.Conn, c *storage.Cache) error {
+func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 	//fmt.Println("Entering handle")
 	defer conn.Close()
 	Reader := bufio.NewReader(conn)
@@ -116,6 +117,9 @@ func handle(conn net.Conn, c *storage.Cache) error {
 			// }
 			writeString := strings.Join(elements[1:], "")
 			handleWrite(*Writer, resp.EchoRESP(writeString))
+		case "RPUSH":
+			length := lst.RPUSH(elements[1], elements[2])
+			handleWrite(*Writer, ":"+strconv.Itoa(length)+"\r\n")
 		}
 	}
 }
@@ -124,6 +128,7 @@ func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Logs from your program will appear here!")
 	c := storage.NewCache()
+	list := storage.NewList()
 	// Uncomment the code below to pass the first stage
 	l, err := net.Listen("tcp", "0.0.0.0:6379")
 	if err != nil {
@@ -136,7 +141,7 @@ func main() {
 			fmt.Println("Error accepting connection: ", err.Error())
 			os.Exit(1)
 		}
-		go handle(conn, c)
+		go handle(conn, c, list)
 	}
 
 }
