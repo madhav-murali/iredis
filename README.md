@@ -1,33 +1,73 @@
-[![progress-banner](https://backend.codecrafters.io/progress/redis/40315363-1e8e-4afa-a152-4a284c6c52a6)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# iredis
 
-This is a starting point for Go solutions to the
-["Build Your Own Redis" Challenge](https://codecrafters.io/challenges/redis).
+A high-performance Redis clone written in **Go**, focused on low-latency execution and the **RESP (Redis Serialization Protocol)**. 
 
-In this challenge, you'll build a toy Redis clone that's capable of handling
-basic commands like `PING`, `SET` and `GET`. Along the way we'll learn about
-event loops, the Redis protocol and more.
+## 🚀 Overview
+**iredis** is an in-memory data store built from the ground up to explore the internals of distributed systems, networking, and concurrent data access. It achieves **$O(1)$** time complexity for core operations and supports a variety of data types, including Strings and Lists.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+### Key Features
+* **RESP v2 Protocol:** Hand-rolled parser for bulk strings, arrays, and integers.
+* **Concurrent Networking:** Leverages Go's goroutines to handle multiple TCP client connections simultaneously.
+* **Data Structures:** * **Strings:** `GET`, `SET`, `ECHO`.
+    * **Lists:** Full support for linked-list operations including `LPUSH`, `RPUSH`, `LPOP`, and `LRANGE`.
+* **Performance:** Designed for $O(1)$ lookup and insertion for primary data storage.
 
-# Passing the first stage
+---
 
-The entry point for your Redis implementation is in `app/main.go`. Study and
-uncomment the relevant code, and push your changes to pass the first stage:
+## 🛠 Tech Stack
+* **Language:** Go (Golang)
+* **Transport:** TCP Sockets
+* **Serialization:** RESP (Redis Serialization Protocol)
 
-```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
+---
+
+## 🏗 Architecture
+The project is modularized to separate the networking logic from the command execution engine.
+
+* **Command Handler:** A central switchboard that routes RESP-parsed commands to the appropriate storage logic.
+* **Storage Engine:** Thread-safe storage using Go's internal maps and custom list implementations to ensure data integrity during concurrent access.
+* **RESP Formatter:** A dedicated utility package to ensure all outbound data strictly adheres to the Redis protocol.
+
+### Implementation Snippet (Command Dispatcher)
+```go
+case "RPUSH":
+    length := lst.RPUSH(elements[1], elements[2:])
+    handleWrite(*Writer, ":"+strconv.Itoa(length)+"\r\n")
+case "LRANGE":
+    handleWrite(*Writer, resp.ArrayRESP(lst.LRANGE(elements[1], elements[2], elements[3])))
 ```
 
-That's all!
+---
 
-# Stage 2 & beyond
+## 🚦 Getting Started
 
-Note: This section is for stages 2 and beyond.
+### Installation
+```bash
+git clone https://github.com/your-username/iredis.git
+cd iredis
+```
 
-1. Ensure you have `go (1.26)` installed locally
-1. Run `./your_program.sh` to run your Redis server, which is implemented in
-   `app/main.go`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+### Running the Server
+```bash
+go run main.go
+```
+
+### Testing
+You can interact with **iredis** using the standard `redis-cli`:
+```bash
+redis-cli LPUSH mylist "world"
+redis-cli LPUSH mylist "hello"
+redis-cli LRANGE mylist 0 -1
+# Output: 1) "hello" 2) "world"
+```
+
+---
+
+## 📈 Roadmap
+- [x] Basic RESP Parsing
+- [x] Key-Value (String) support
+- [x] List support (`LPUSH`, `RPUSH`, `LPOP`, `LLEN`)
+- [ ] Set/Hash support
+- [ ] Persistence (RDB/AOF)
+- [ ] Pub/Sub Architecture
+
