@@ -98,10 +98,12 @@ func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 			writeString := strings.Join(elements[1:], "")
 			handleWrite(*Writer, resp.EchoRESP(writeString))
 		case "RPUSH":
-			length := lst.MultiRPUSH(elements[1], elements[2:])
+			length := lst.RPUSH(elements[1], elements[2:])
 			handleWrite(*Writer, ":"+strconv.Itoa(length)+"\r\n")
 		case "LRANGE":
 			handleWrite(*Writer, resp.RESPstring(lst.LRANGE(elements[1], elements[2], elements[3])))
+		case "LPUSH":
+
 		}
 	}
 }

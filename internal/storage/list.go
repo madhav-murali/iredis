@@ -2,6 +2,7 @@ package storage
 
 import "strconv"
 
+// TODO: change from map to a linked list/ deque for o(1) LPUSH
 type List struct {
 	Items map[string][]string
 }
@@ -12,12 +13,12 @@ func NewList() *List {
 	}
 }
 
-func (l *List) RPUSH(key, val string) int {
-	l.Items[key] = append(l.Items[key], val)
-	return len(l.Items[key])
-}
+// func (l *List) RPUSH(key, val string) int {
+// 	l.Items[key] = append(l.Items[key], val)
+// 	return len(l.Items[key])
+// }
 
-func (l *List) MultiRPUSH(key string, val []string) int {
+func (l *List) RPUSH(key string, val []string) int {
 	for _, v := range val {
 		l.Items[key] = append(l.Items[key], v)
 	}
@@ -48,4 +49,14 @@ func (l *List) LRANGE(key, start, end string) []string {
 	return ret
 }
 
-//rpush using a key to a list
+func (l *List) LPUSH(key string, val []string) int {
+	length := len(val)
+	l.Items[key] = append(l.Items[key], make([]string, length)...)
+	copy(l.Items[key][length:], l.Items[key])
+	i := length - 1
+	for _, v := range val {
+		l.Items[key][i] = v
+		i--
+	}
+	return len(l.Items[key])
+}
