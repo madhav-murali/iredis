@@ -34,8 +34,8 @@ func (l *List) LRANGE(key string, s, e string) []string {
 	if err != nil {
 		return nil
 	}
-	end := min(eInt, len(l.Items[key]))
-	for i := sInt; i < end; i++ {
+	end := min(eInt, len(l.Items[key])-1)
+	for i := sInt; i <= end; i++ {
 		ret = append(ret, l.Items[key][i])
 	}
 	return ret
