@@ -107,6 +107,13 @@ func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 			handleWrite(*Writer, ":"+strconv.Itoa(length)+"\r\n")
 		case "LLEN":
 			handleWrite(*Writer, ":"+strconv.Itoa(lst.LLEN(elements[1]))+"\r\n")
+		case "LPOP":
+			st := lst.LPOP(elements[1])
+			if st == "" {
+				handleWrite(*Writer, "$-1\r\n")
+				return errors.New("invalid key or has no elems")
+			}
+			handleWrite(*Writer, resp.EchoRESP(st))
 		}
 	}
 }

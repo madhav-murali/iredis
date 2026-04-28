@@ -65,3 +65,13 @@ func (l *List) LPUSH(key string, val []string) int {
 func (l *List) LLEN(key string) int {
 	return len(l.Items[key])
 }
+
+func (l *List) LPOP(key string) string {
+	if len(l.Items[key]) == 0 {
+		return ""
+	}
+	defer func() {
+		l.Items[key] = l.Items[key][1:]
+	}()
+	return l.Items[key][0]
+}
