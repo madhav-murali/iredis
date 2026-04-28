@@ -117,7 +117,12 @@ func handle(conn net.Conn, c *storage.Cache, lst *storage.List) error {
 					return errors.New("invalid key or has no elems")
 				}
 			}
-			s.WriteString(resp.RESPstring(lst.LPOP(elements[1], toPop)))
+			if toPop > 1 {
+				s.WriteString(resp.RESPstring(lst.LPOP(elements[1], toPop)))
+			} else {
+				s.WriteString(resp.EchoRESP(lst.LPOP(elements[1], toPop)[0]))
+			}
+
 			st := s.String()
 			if st == "-1" {
 				handleWrite(*Writer, "$-1\r\n")
